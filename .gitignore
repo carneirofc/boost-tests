@@ -1,2 +1,5 @@
 .idea
+.vscode
+vendor
+simple-program/build/
 simple-program/cmake-build-debug
