@@ -1,11 +1,7 @@
-//
-// Created by carneirofc on 05/12/2019.
-//
-#include "Regatron.hpp"
+
+#include <iostream>
+#include <functional>
 
 int main(){
-    std::unique_ptr<Regatron> reg = std::make_unique<Regatron>();
-    reg->moduleIDInfo();
-    reg->connect(1);
-    return 0;
+    [out = std::ref(std::cout << "Hello World")](){ out.get() << "!\n"; }();
 }

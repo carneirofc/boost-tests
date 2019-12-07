@@ -9,11 +9,13 @@
 #define SYS_VALUES 64
 #define DEV_VALUES 0
 
+class RegatronException : public std::runtime_error{
+
+};
+
 class Regatron{
 private:
-  int result = 0;
   int portNrFound = -1;
-  unsigned int connectionType = 0;
   unsigned int version; //major and minor
   unsigned int build;
   unsigned int moduleID = -1;
@@ -31,18 +33,12 @@ private:
   double currentPhys;
   double powerPhys;
   double resistancePhys;
-  double voltage;
-  double current;
-  double power;
-  double resitance;
-  double randFactor;
-  double randValue;
 
   double sysVoltage;
   double sysCurrent;
   double sysPower;
 
-  int readDllVersion();
+  void readDllVersion();
 
   void selectModule(int);
   void selectDevice();
@@ -51,8 +47,8 @@ private:
 public:
   Regatron();
   ~Regatron();
-  int connect(int);
-  int connect(int, int);
+  void connect(int);
+  void connect(int, int);
   bool isMaster();
   void moduleIDInfo();
   void readSystem();

@@ -3,30 +3,30 @@
 
 Regatron::Regatron(){
     this->readDllVersion();
-    BOOST_LOG_TRIVIAL(info) << "initializing tcio lib" << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "initializing tcio lib";
     DllInit();
 }
 
 Regatron::~Regatron(){
-    BOOST_LOG_TRIVIAL(info) << "initializing tcio lib" << std::endl;
     if(DllClose() != DLL_SUCCESS){
-      BOOST_LOG_TRIVIAL(fatal) << "failed to close tcio lib" << std::endl;
+      BOOST_LOG_TRIVIAL(fatal) << "failed to close tcio lib";
     }
+    BOOST_LOG_TRIVIAL(info) << "regatron obj deleted";
 }
 
 
-int Regatron::readDllVersion(){
+void Regatron::readDllVersion(){
     if (DllReadVersion(&version, &build, dllString) != DLL_SUCCESS){
         throw std::runtime_error("failed to initialize tcio lib.");
     }
-    BOOST_LOG_TRIVIAL(info)  << "Version:" << (version >> 16) << "." << (version & 0xff) << " build:" << build << " dllString:" << dllString << std::endl;
-};
+    BOOST_LOG_TRIVIAL(info)  << "Version:" << (version >> 16) << "." << (version & 0xff) << " build:" << build << " dllString:" << dllString;
+}
 
-int Regatron::connect(int port){
+void Regatron::connect(int port){
    Regatron::connect(port, port);
 }
 
-int Regatron::connect(int fromPort, int toPort){
+void Regatron::connect(int fromPort, int toPort){
     //search device connected via DIGI RealPort adapter -> /dev/ttyD00 
     if(DllSetSearchDevice2ttyDIGI() != DLL_SUCCESS){
       throw std::runtime_error("failed to set ttyDIGI");
@@ -34,7 +34,7 @@ int Regatron::connect(int fromPort, int toPort){
     
     //search device
     usleep((__useconds_t)(1000*1000*2));//hack: while eth and rs232 at the same tc device: wait 2 sec
-    BOOST_LOG_TRIVIAL(info) << "searching from " << fromPort << " to " <<toPort << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "searching from " << fromPort << " to " <<toPort;
     
     if(DllSearchDevice(fromPort, toPort, &portNrFound) !=  DLL_SUCCESS){
       throw std::runtime_error(str(boost::format("failed to connect to device. Port range (%s, %s)") % fromPort % toPort ));
@@ -94,15 +94,15 @@ void Regatron::readSystem(){
 
 void Regatron::moduleIDInfo(){
   if(this->portNrFound == -1){
-    BOOST_LOG_TRIVIAL(error) << "not connected." <<std::endl;
+    BOOST_LOG_TRIVIAL(error) << "not connected.";
   }
   if(this->moduleID == -1){
-    BOOST_LOG_TRIVIAL(error) << "module id not defined." <<std::endl;
+    BOOST_LOG_TRIVIAL(error) << "module id not defined.";
   }
   if(this->moduleID != 1 && this->portNrFound != -1){
     BOOST_LOG_TRIVIAL(info) << 
       boost::format("module connect at %s is configured as %s, module ID %s.")
-        % this->portNrFound % ((this->moduleID==0)?"master":"slave") % this->moduleID << std::endl;
+        % this->portNrFound % ((this->moduleID==0)?"master":"slave") % this->moduleID;
   }
 }
 
