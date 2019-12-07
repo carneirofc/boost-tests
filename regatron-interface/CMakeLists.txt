@@ -6,7 +6,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 set(BOOST_ROOT /home/carneirofc/boost-tests/vendor/boost_1_71_0)
 
 set(Boost_USE_MULTITHREADED ON)
-SET(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.71.0 COMPONENTS log)
 
 add_executable(regatron main.cpp Regatron.cpp)
