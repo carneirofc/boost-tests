@@ -1,5 +1,9 @@
 # boost-tests
-
+## CMake
+```
+-DCMAKE_BUILD_TYPE=Release
+-DCMAKE_BUILD_TYPE=Debug
+```
 ## Setup Boost
 [Get boost](https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2)
 
