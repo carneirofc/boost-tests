@@ -12,3 +12,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 add_executable(main main.cpp)
 set_property(TARGET main PROPERTY CXX_STANDARD 17)
+
+find_package(fmt REQUIRED)
+find_package(spdlog REQUIRED)
+
+target_link_libraries(main fmt::fmt spdlog::spdlog_header_only)
