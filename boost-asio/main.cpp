@@ -1,9 +1,12 @@
 
 #include <iostream>
+#include "string"
+#include "vector"
 #include "boost/asio.hpp"
 #include "boost/bind.hpp"
 
 #include "Logger.hpp"
+#include "Client.hpp"
 
 void example1(){
     LOG_INFO("Example 1"); 
@@ -89,7 +92,15 @@ void example5(){
     LOG_INFO("Example 5");
 }
 
-int main(){
+int main(int argc, char* argv[]){
     Utils::Logger::Init();
+    if(argc != 3){
+        LOG_ERROR("Params: <host> <port>");
+        return -1;
+    }
+    // Args to vector
+    // std::vector<std::string> params(argv, argv + argc);
+    
+    Client::run(argv[1], argv[2]);
     return 0;
 }
