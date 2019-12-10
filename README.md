@@ -17,6 +17,13 @@
 [On how to use it](https://github.com/fmtlib/fmt/blob/master/doc/usage.rst)
 as submodule...
 
+## [spdlog](https://github.com/gabime/spdlog)
+```
+cd vendor/spdlog && mkdir build && cd build
+cmake .. && make -j
+```
+
+
 ## Boost
 [Get boost](https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2)
 
@@ -30,4 +37,4 @@ Compile boost modules:
 ```
 ## Regatron
 [TCIO API](https://www.regatron.com/service/download/programming-interfaces/tcio-api.zip)
- 
+

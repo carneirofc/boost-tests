@@ -33,15 +33,15 @@ namespace Regatron {
   }
 
   void Comm::connect(int fromPort, int toPort){
-      //search device connected via DIGI RealPort adapter -> /dev/ttyD00 
+      //search device connected via DIGI RealPort adapter -> /dev/ttyD00
       if(DllSetSearchDevice2ttyDIGI() != DLL_SUCCESS){
         throw std::runtime_error("failed to set ttyDIGI");
       }
-      
+
       //search device
       usleep((__useconds_t)(1000*1000*2));//hack: while eth and rs232 at the same tc device: wait 2 sec
       REG_LOG_INFO("searching from {} to {}",fromPort , toPort);
-      
+
       if(DllSearchDevice(fromPort, toPort, &portNrFound) !=  DLL_SUCCESS){
         throw std::runtime_error(fmt::format("failed to connect to device. Port range ({}, {})", fromPort, toPort ));
       }
@@ -95,6 +95,21 @@ namespace Regatron {
 
       if(TC4GetPowerAct(&sysPower) != DLL_SUCCESS){
         throw std::runtime_error("failed to read system power");
+      }
+  }
+
+  void Comm::readDevice(){
+      this->selectDevice();
+      if(TC4GetVoltageAct(&devVoltage) != DLL_SUCCESS){
+        throw std::runtime_error("failed to read device voltage");
+      }
+
+      if(TC4GetCurrentAct(&devCurrent) != DLL_SUCCESS){
+        throw std::runtime_error("failed to read device current");
+      }
+
+      if(TC4GetPowerAct(&devPower) != DLL_SUCCESS){
+        throw std::runtime_error("failed to read device power");
       }
   }
 
