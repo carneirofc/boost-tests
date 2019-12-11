@@ -15,7 +15,7 @@ namespace Client{
        boost::asio::write(socket, boost::asio::buffer(message));
     }
 
-    void run(std::string host, std::string port){
+    void connect(std::string host, std::string port){
         try{
             // All programs that use asio need to have at least one io_context object. 
             boost::asio::io_context io;
