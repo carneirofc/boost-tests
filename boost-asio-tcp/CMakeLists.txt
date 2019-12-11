@@ -5,7 +5,7 @@ project(boost-asio)
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -fno-omit-frame-pointer -
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 # Boost
-set(BOOST_ROOT /home/controle/cpp-snippets/vendor/boost_1_71_0)
+set(BOOST_ROOT ${CMAKE_CURRENT_LIST_DIR}/../vendor/boost_1_71_0)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.71.0 COMPONENTS regex)
