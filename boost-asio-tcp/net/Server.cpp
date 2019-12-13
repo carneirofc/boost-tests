@@ -1,6 +1,9 @@
 #include "Server.hpp"
 
 namespace Net{
+
+    Server::Server(std::shared_ptr<Net::Handler> m_handler): m_handler(std::move(m_handler)){}
+
     std::string Server::read(boost::asio::ip::tcp::socket& socket){
         boost::asio::streambuf buf;
         boost::asio::read_until(socket, buf, "\n" );
@@ -11,12 +14,6 @@ namespace Net{
     void Server::write(boost::asio::ip::tcp::socket& socket, const std::string& message){
        const std::string msg = message + "\n";
        boost::asio::write(socket, boost::asio::buffer(message));
-    }
-
-    void Server::handle(boost::asio::ip::tcp::socket& socket,const std::string& message){
-        //write operation
-        LOG_INFO("From client: {}", message);
-        this->write(socket, "Hello From Server!");
     }
 
     void Server::listen(const int port){
@@ -36,7 +33,8 @@ namespace Net{
                 //read operation
                 while(true){
                     const std::string message = Server::read(socket_);
-                    Server::handle(socket_, message);
+                    const std::string out_message =  this->m_handler->handle(socket_, message);
+                    this->write(socket_, out_message);
                 }
             }catch(std::runtime_error &e){
                 LOG_CRITICAL("Exception: {}", e.what());

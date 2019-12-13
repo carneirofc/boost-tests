@@ -19,7 +19,7 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.71.0 COMPONENTS regex)
 
-add_executable(main main.cpp log/Logger.cpp net/Server.cpp)
+add_executable(main main.cpp log/Logger.cpp net/Server.cpp net/Handler.cpp)
 target_include_directories(main PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR})
 set_property(TARGET main PROPERTY CXX_STANDARD 17)
 
