@@ -12,7 +12,6 @@ namespace Net{
     }
 
     void Server::write(boost::asio::ip::tcp::socket& socket, const std::string& message){
-       const std::string msg = message + "\n";
        boost::asio::write(socket, boost::asio::buffer(message));
     }
 
@@ -33,8 +32,7 @@ namespace Net{
                 //read operation
                 while(true){
                     const std::string message = Server::read(socket_);
-                    const std::string out_message =  this->m_handler->handle(socket_, message);
-                    this->write(socket_, out_message);
+                    this->write(socket_, this->m_handler->handle(message));
                 }
             }catch(std::runtime_error &e){
                 LOG_CRITICAL("Exception: {}", e.what());
