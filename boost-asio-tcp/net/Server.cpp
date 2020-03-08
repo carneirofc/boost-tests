@@ -4,10 +4,10 @@ namespace Net{
 
     Server::Server(std::shared_ptr<Net::Handler> m_handler): m_handler(std::move(m_handler)){}
 
-    std::string Server::read(boost::asio::ip::tcp::socket& socket){
+    const std::string Server::read(boost::asio::ip::tcp::socket& socket){
         boost::asio::streambuf buf;
         boost::asio::read_until(socket, buf, "\n" );
-        std::string data = boost::asio::buffer_cast<const char*>(buf.data());
+        const std::string data = boost::asio::buffer_cast<const char*>(buf.data());
         return data;
     }
 

@@ -4,7 +4,8 @@ import time
 
 messages = [
         'get float\n',
-        'set float 100.0\n'
+        'set float 100.0\n',
+        'set float_test 200.0\n'
         ]
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
