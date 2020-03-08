@@ -24,6 +24,11 @@ function spdlog(){
 
 function boost(){
     # Boost
+    pushd vendor
+    wget  https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.bz2
+    tar --bzip2 -xf boost_1_71_0.tar.bz2
+    rm -f boost_1_71_0.tar.bz2
+    popd
     pushd vendor/boost_1_71_0/
     ./bootstrap.sh --with-libraries=regex
     ./b2
