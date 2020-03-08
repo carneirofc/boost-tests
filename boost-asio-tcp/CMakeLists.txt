@@ -21,7 +21,7 @@ find_package(Boost 1.71.0 COMPONENTS regex)
 
 add_executable(main main.cpp log/Logger.cpp net/Server.cpp net/Handler.cpp)
 target_include_directories(main PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR})
-set_property(TARGET main PROPERTY CXX_STANDARD 17)
+set_property(TARGET main PROPERTY CXX_STANDARD 20)
 
 if(Boost_FOUND)
     target_include_directories(main PRIVATE ${Boost_INCLUDE_DIRS})
