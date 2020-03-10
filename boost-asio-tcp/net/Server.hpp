@@ -13,7 +13,7 @@ namespace Net{
 
         private:
             void write(boost::asio::ip::tcp::socket& socket,const std::string& message);
-            std::string read(boost::asio::ip::tcp::socket& socket);
+            const std::string read(boost::asio::ip::tcp::socket& socket);
             std::shared_ptr<Net::Handler> m_handler;
     };
 }
