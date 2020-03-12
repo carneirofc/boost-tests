@@ -1,31 +1,67 @@
 #include "Comm.hpp"
 
-#include "Logger.hpp"
-
 #include <iostream>
 #include <unistd.h>
+
 #include "serialiolib.h"
 #include "fmt/format.h"
+#include "log/Logger.hpp"
 
 namespace Regatron {
-  Comm::Comm(){
+  Comm::Comm(int port):
+          port(port),
+          version(std::make_shared<Regatron::Version>()),
+          sysLimits(std::make_shared<Regatron::Limits>()),
+          devLimits(std::make_shared<Regatron::Limits>()) {
       this->readDllVersion();
-      REG_LOG_INFO("initializing tcio lib");
+      LOG_INFO("initializing tcio lib");
       DllInit();
+  }
+  Comm::Comm(){
+    Comm(1);
   }
 
   Comm::~Comm(){
       if(DllClose() != DLL_SUCCESS){
-        REG_LOG_ERROR("failed to close tcio lib");
+        LOG_ERROR("failed to close tcio lib");
       }
-      REG_LOG_INFO("regatron obj deleted");
+      LOG_INFO("regatron obj deleted");
   }
 
   void Comm::readDllVersion(){
-      if (DllReadVersion(&version, &build, dllString) != DLL_SUCCESS){
+      if (DllReadVersion(&versionDllMajorMinor, &versionDllBuild, versionDllString) != DLL_SUCCESS){
           throw std::runtime_error("failed to initialize tcio lib.");
       }
-      REG_LOG_INFO("Version: {}.{} Build: {} dllString:{}", (version >>16), (version&0xff), build, dllString);
+      LOG_INFO("Dll version: {}.{}.{}, {} dllString:{}", 
+          (versionDllMajorMinor >>16), (versionDllMajorMinor&0xff), versionDllBuild, versionDllString);
+  }
+
+  void Comm::readDSPVersion(){
+    if(TC4GetDeviceDSPID(&versionDSPMain, &versionDSPSub, &versionDSPRevision) != DLL_SUCCESS){
+        throw std::runtime_error("failed to read DSP firmware version.");
+    }
+    if(TC4GetPDSPVersion(&versionPeripherieDSP) != DLL_SUCCESS){
+      throw std::runtime_error("failed to read version of peripherie-DSP.");
+    }
+    if(TC4GetPeripherieVersion(&versionPeripherieAuxiliaryDSP, &versionModulatorAuxiliaryDSP, &versionBootloader) != DLL_SUCCESS){
+      throw std::runtime_error("failed to read auxiliary DSP module version (peripherie, modulator and bootloader).");
+    }
+
+    LOG_INFO(
+      "Version DSP:\n"
+              "  Firmware {}.{}.{}\n"
+              "  Pheripherie: 0.{}\n"
+              "  Bootloader: {}\n"
+      "Version Auxiliary DSP:\n"
+              "  Peripherie: 0.{}\n"
+              "  Modulator: 0.{}",
+              versionDSPMain, versionDSPSub, versionDSPRevision,
+              versionPeripherieDSP,
+              versionBootloader, versionPeripherieAuxiliaryDSP, versionModulatorAuxiliaryDSP);
+  }
+
+  void Comm::connect(){
+    this->connect(port, port);
   }
 
   void Comm::connect(int port){
@@ -40,7 +76,7 @@ namespace Regatron {
 
       //search device
       usleep((__useconds_t)(1000*1000*2));//hack: while eth and rs232 at the same tc device: wait 2 sec
-      REG_LOG_INFO("searching from {} to {}",fromPort , toPort);
+      LOG_INFO("searching from {} to {}", fromPort , toPort);
 
       if(DllSearchDevice(fromPort, toPort, &portNrFound) !=  DLL_SUCCESS){
         throw std::runtime_error(fmt::format("failed to connect to device. Port range ({}, {})", fromPort, toPort ));
@@ -48,7 +84,7 @@ namespace Regatron {
 
       //set remote control to RS232
       if(TC4SetRemoteControlInput(2) != DLL_SUCCESS){
-        throw  std::runtime_error("failed to set remote control do RS232.");
+        throw std::runtime_error("failed to set remote control do RS232.");
       }
 
       //init lib
@@ -115,10 +151,10 @@ namespace Regatron {
 
   void Comm::moduleIDInfo(){
     if(this->portNrFound == -1){
-      REG_LOG_WARN("not connected to any device.");
+      LOG_WARN("not connected to any device.");
     }
     if(this->portNrFound != -1){
-      REG_LOG_INFO(fmt::format("module connect at {} is configured as {}, module ID {}.",
+      LOG_INFO(fmt::format("module connect at {} is configured as {}, module ID {}.",
           this->portNrFound, ((this->moduleID==0)?"master":"slave"), this->moduleID));
     }
   }

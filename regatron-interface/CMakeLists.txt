@@ -10,6 +10,9 @@ endif()
 
 set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
@@ -20,8 +23,15 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.71.0 COMPONENTS regex)
 
-add_executable(regatron main.cpp Comm.cpp Logger.cpp)
-set_property(TARGET regatron PROPERTY CXX_STANDARD 17)
+add_executable(regatron 
+    main.cpp 
+    log/Logger.cpp
+    net/Handler.cpp
+    net/Server.cpp
+    regatron/Comm.cpp
+    regatron/Handler.cpp
+)
+set_property(TARGET regatron PROPERTY CXX_STANDARD 20)
 target_include_directories(regatron PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(Boost_FOUND)
