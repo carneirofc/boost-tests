@@ -1,21 +1,19 @@
 #include "Comm.hpp"
 
 #include <iostream>
-
 #include "serialiolib.h"
+
 #include "fmt/format.h"
 #include "log/Logger.hpp"
 
 namespace Regatron {
   Comm::Comm(int port):
-          port(port),
-          version(std::make_shared<Regatron::Version>()),
-          sysLimits(std::make_shared<Regatron::Limits>()),
-          devLimits(std::make_shared<Regatron::Limits>()) {
-      this->readDllVersion();
+          m_port(port), m_version(std::make_shared<Regatron::Version>()), m_readings(std::make_shared<Regatron::Readings>()) {
+      this->m_version->readDllVersion();
       LOG_INFO("initializing tcio lib");
       DllInit();
   }
+
   Comm::Comm(){
     Comm(1);
   }
@@ -27,40 +25,8 @@ namespace Regatron {
       LOG_INFO("regatron obj deleted");
   }
 
-  void Comm::readDllVersion(){
-  //     if (DllReadVersion(&versionDllMajorMinor, &versionDllBuild, versionDllString) != DLL_SUCCESS){
-  //         throw std::runtime_error("failed to initialize tcio lib.");
-  //     }
-  //     LOG_INFO("Dll version: {}.{}.{}, {} dllString:{}", 
-  //         (versionDllMajorMinor >>16), (versionDllMajorMinor&0xff), versionDllBuild, versionDllString);
-  // }
-
-  // void Comm::readDSPVersion(){
-  //   if(TC4GetDeviceDSPID(&versionDSPMain, &versionDSPSub, &versionDSPRevision) != DLL_SUCCESS){
-  //       throw std::runtime_error("failed to read DSP firmware version.");
-  //   }
-  //   if(TC4GetPDSPVersion(&versionPeripherieDSP) != DLL_SUCCESS){
-  //     throw std::runtime_error("failed to read version of peripherie-DSP.");
-  //   }
-  //   if(TC4GetPeripherieVersion(&versionPeripherieAuxiliaryDSP, &versionModulatorAuxiliaryDSP, &versionBootloader) != DLL_SUCCESS){
-  //     throw std::runtime_error("failed to read auxiliary DSP module version (peripherie, modulator and bootloader).");
-  //   }
-
-    // LOG_INFO(
-    //   "Version DSP:\n"
-    //           "  Firmware {}.{}.{}\n"
-    //           "  Pheripherie: 0.{}\n"
-    //           "  Bootloader: {}\n"
-    //   "Version Auxiliary DSP:\n"
-    //           "  Peripherie: 0.{}\n"
-    //           "  Modulator: 0.{}",
-    //           versionDSPMain, versionDSPSub, versionDSPRevision,
-    //           versionPeripherieDSP,
-    //           versionBootloader, versionPeripherieAuxiliaryDSP, versionModulatorAuxiliaryDSP);
-  }
-
   void Comm::connect(){
-    this->connect(port, port);
+    this->connect(m_port, m_port);
   }
 
   void Comm::connect(int port){
@@ -77,7 +43,7 @@ namespace Regatron {
       usleep((__useconds_t)(1000*1000*2));//hack: while eth and rs232 at the same tc device: wait 2 sec
       LOG_INFO("searching from {} to {}", fromPort , toPort);
 
-      if(DllSearchDevice(fromPort, toPort, &portNrFound) !=  DLL_SUCCESS){
+      if(DllSearchDevice(fromPort, toPort, &m_portNrFound) !=  DLL_SUCCESS){
         throw std::runtime_error(fmt::format("failed to connect to device. Port range ({}, {})", fromPort, toPort ));
       }
 
@@ -93,16 +59,13 @@ namespace Regatron {
           throw std::runtime_error("failed to get physical values increment.");
       }
 
-      if(TC4GetModuleID(&(this->moduleID)) != DLL_SUCCESS){
+      if(TC4GetModuleID(&(this->m_moduleID)) != DLL_SUCCESS){
         throw std::runtime_error("failed to get module ID.");
       }
 
-      if(this->isMaster()){
-        // Get system valus !
-        if(TC4GetSystemPhysicalLimitNom(&voltagePhys, &currentPhys, &powerPhys, &resistancePhys) != DLL_SUCCESS){
-          throw std::runtime_error("failed to get system physical nominal values.");
-        }
-      }
+      // One time readings... update on every new connection
+      if(this->isMaster()){m_readings->readSystemPhys();}
+      m_readings->readModulePhys();
   }
 
   void Comm::selectSystem(){
@@ -149,16 +112,16 @@ namespace Regatron {
   }
 
   void Comm::moduleIDInfo(){
-    if(this->portNrFound == -1){
+    if(this->m_portNrFound == -1){
       LOG_WARN("not connected to any device.");
     }
-    if(this->portNrFound != -1){
+    if(this->m_portNrFound != -1){
       LOG_INFO(fmt::format("module connect at {} is configured as {}, module ID {}.",
-          this->portNrFound, ((this->moduleID==0)?"master":"slave"), this->moduleID));
+          this->m_portNrFound, ((this->m_moduleID==0)?"master":"slave"), this->m_moduleID));
     }
   }
 
   bool Comm::isMaster(){
-    return this->moduleID == 0;
+    return this->m_moduleID == 0;
   }
 }
