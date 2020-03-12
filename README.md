@@ -35,6 +35,8 @@ Compile boost modules:
 ./bootstrap.sh --with-libraries=log regex
 ./b2 install
 ```
+
 ## Regatron
 [TCIO API](https://www.regatron.com/service/download/programming-interfaces/tcio-api.zip)
 
+* Using conan as package manager !

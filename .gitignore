@@ -2,4 +2,3 @@
 .vscode/settings.json
 .vscode/tasks.json
 regatron-interface/build/
-regatron-interface/cmake-build-debug

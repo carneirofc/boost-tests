@@ -41,7 +41,7 @@ namespace Regatron{
 
                     if(message.starts_with(SET)){
                         if(MATCH_SET(VOLTAGE)){
-                            /* handle shit */
+                            /** handle shit */
                             return ACK;
                         }
 

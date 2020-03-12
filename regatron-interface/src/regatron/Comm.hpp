@@ -4,9 +4,12 @@
 #define SYS_VALUES 64
 #define DEV_VALUES 0
 
+#include <memory>
+#include <unistd.h>
+
 namespace Regatron {
 
-  class Limits{
+  class Limits {
     public:
       double voltagePhysMax;     // [V]
       double currentPhysMax;     // [A]
@@ -46,7 +49,7 @@ namespace Regatron {
       unsigned short IBCFirmwareVer = 0;
   };
 
-  class Comm{
+  class Comm {
     private:
       int port = 0;
       int portNrFound = -1;

@@ -1,7 +1,6 @@
 #include "Comm.hpp"
 
 #include <iostream>
-#include <unistd.h>
 
 #include "serialiolib.h"
 #include "fmt/format.h"
@@ -29,35 +28,35 @@ namespace Regatron {
   }
 
   void Comm::readDllVersion(){
-      if (DllReadVersion(&versionDllMajorMinor, &versionDllBuild, versionDllString) != DLL_SUCCESS){
-          throw std::runtime_error("failed to initialize tcio lib.");
-      }
-      LOG_INFO("Dll version: {}.{}.{}, {} dllString:{}", 
-          (versionDllMajorMinor >>16), (versionDllMajorMinor&0xff), versionDllBuild, versionDllString);
-  }
+  //     if (DllReadVersion(&versionDllMajorMinor, &versionDllBuild, versionDllString) != DLL_SUCCESS){
+  //         throw std::runtime_error("failed to initialize tcio lib.");
+  //     }
+  //     LOG_INFO("Dll version: {}.{}.{}, {} dllString:{}", 
+  //         (versionDllMajorMinor >>16), (versionDllMajorMinor&0xff), versionDllBuild, versionDllString);
+  // }
 
-  void Comm::readDSPVersion(){
-    if(TC4GetDeviceDSPID(&versionDSPMain, &versionDSPSub, &versionDSPRevision) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read DSP firmware version.");
-    }
-    if(TC4GetPDSPVersion(&versionPeripherieDSP) != DLL_SUCCESS){
-      throw std::runtime_error("failed to read version of peripherie-DSP.");
-    }
-    if(TC4GetPeripherieVersion(&versionPeripherieAuxiliaryDSP, &versionModulatorAuxiliaryDSP, &versionBootloader) != DLL_SUCCESS){
-      throw std::runtime_error("failed to read auxiliary DSP module version (peripherie, modulator and bootloader).");
-    }
+  // void Comm::readDSPVersion(){
+  //   if(TC4GetDeviceDSPID(&versionDSPMain, &versionDSPSub, &versionDSPRevision) != DLL_SUCCESS){
+  //       throw std::runtime_error("failed to read DSP firmware version.");
+  //   }
+  //   if(TC4GetPDSPVersion(&versionPeripherieDSP) != DLL_SUCCESS){
+  //     throw std::runtime_error("failed to read version of peripherie-DSP.");
+  //   }
+  //   if(TC4GetPeripherieVersion(&versionPeripherieAuxiliaryDSP, &versionModulatorAuxiliaryDSP, &versionBootloader) != DLL_SUCCESS){
+  //     throw std::runtime_error("failed to read auxiliary DSP module version (peripherie, modulator and bootloader).");
+  //   }
 
-    LOG_INFO(
-      "Version DSP:\n"
-              "  Firmware {}.{}.{}\n"
-              "  Pheripherie: 0.{}\n"
-              "  Bootloader: {}\n"
-      "Version Auxiliary DSP:\n"
-              "  Peripherie: 0.{}\n"
-              "  Modulator: 0.{}",
-              versionDSPMain, versionDSPSub, versionDSPRevision,
-              versionPeripherieDSP,
-              versionBootloader, versionPeripherieAuxiliaryDSP, versionModulatorAuxiliaryDSP);
+    // LOG_INFO(
+    //   "Version DSP:\n"
+    //           "  Firmware {}.{}.{}\n"
+    //           "  Pheripherie: 0.{}\n"
+    //           "  Bootloader: {}\n"
+    //   "Version Auxiliary DSP:\n"
+    //           "  Peripherie: 0.{}\n"
+    //           "  Modulator: 0.{}",
+    //           versionDSPMain, versionDSPSub, versionDSPRevision,
+    //           versionPeripherieDSP,
+    //           versionBootloader, versionPeripherieAuxiliaryDSP, versionModulatorAuxiliaryDSP);
   }
 
   void Comm::connect(){
