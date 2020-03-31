@@ -4,3 +4,6 @@
 [submodule "vendor/spdlog"]
 	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "cons-regatron-interface"]
+	path = cons-regatron-interface
+	url = https://github.com/carneirofc/cons-regatron-interface.git
