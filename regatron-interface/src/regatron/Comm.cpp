@@ -12,6 +12,7 @@ namespace Regatron {
       this->m_version->readDllVersion();
       LOG_INFO("initializing tcio lib");
       DllInit();
+      getDllStatus();
   }
 
   Comm::Comm(){
@@ -33,6 +34,34 @@ namespace Regatron {
     this->connect(port, port);
   }
 
+  DllStatus Comm::getDllStatus(){
+    int state;
+    int errorNo;
+
+    if(DllGetStatus(&state, &errorNo) != DLL_SUCCESS) {
+      LOG_ERROR("dll status: failed to get Dll status.");
+      return DllStatus::DLL_FAILURE;
+    }
+
+    switch(state){
+        case DllStatus::COMMAND_ERROR:
+          LOG_ERROR("dll status: device command execution error. State={}, errno={}", state, errorNo);
+          return DllStatus::COMMAND_ERROR;
+
+        case DllStatus::COMM_ERROR:
+          LOG_ERROR("dll status: communication error. State={}, errno={}", state, errorNo);
+          return DllStatus::COMM_ERROR;
+
+        case DllStatus::OK:
+          LOG_INFO("dll status: OK");
+          return DllStatus::OK;
+
+        default:
+          LOG_ERROR("dll status: unknown state {}", state);
+          return DllStatus::DLL_FAILURE;
+    }
+  }
+
   void Comm::connect(int fromPort, int toPort){
       //search device connected via DIGI RealPort adapter -> /dev/ttyD00
       if(DllSetSearchDevice2ttyDIGI() != DLL_SUCCESS){
@@ -40,7 +69,7 @@ namespace Regatron {
       }
 
       //search device
-      usleep((__useconds_t)(1000*1000*2));//hack: while eth and rs232 at the same tc device: wait 2 sec
+      usleep(1000*1000*2);//hack: while eth and rs232 at the same tc device: wait 2 sec
       LOG_INFO("searching from {} to {}", fromPort , toPort);
 
       if(DllSearchDevice(fromPort, toPort, &m_portNrFound) !=  DLL_SUCCESS){
@@ -59,56 +88,15 @@ namespace Regatron {
           throw std::runtime_error("failed to get physical values increment.");
       }
 
-      if(TC4GetModuleID(&(this->m_moduleID)) != DLL_SUCCESS){
-        throw std::runtime_error("failed to get module ID.");
-      }
+      m_readings->readModuleID();
 
       // One time readings... update on every new connection
-      if(this->isMaster()){m_readings->readSystemPhys();}
+      m_readings->readAdditionalPhys();
+      if(m_readings->isMaster()){ m_readings->readSystemPhys(); }
       m_readings->readModulePhys();
-  }
 
-  void Comm::selectSystem(){
-    this->selectModule(SYS_VALUES);
-  }
-  void Comm::selectDevice(){
-    this->selectModule(DEV_VALUES);
-  }
-
-  void Comm::selectModule(int module){
-    if(TC4SetModuleSelector(module) != DLL_SUCCESS){
-      throw std::runtime_error(fmt::format("failed to set module selector to {} (code {})", ((module==SYS_VALUES)?"system":"device"), module));
-    }
-  }
-
-  void Comm::readSystem(){
-      this->selectSystem();
-      if(TC4GetVoltageAct(&sysVoltage) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read system voltage");
-      }
-
-      if(TC4GetCurrentAct(&sysCurrent) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read system current");
-      }
-
-      if(TC4GetPowerAct(&sysPower) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read system power");
-      }
-  }
-
-  void Comm::readDevice(){
-      this->selectDevice();
-      if(TC4GetVoltageAct(&devVoltage) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read device voltage");
-      }
-
-      if(TC4GetCurrentAct(&devCurrent) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read device current");
-      }
-
-      if(TC4GetPowerAct(&devPower) != DLL_SUCCESS){
-        throw std::runtime_error("failed to read device power");
-      }
+      // Default is to keep system selected !
+      m_readings->selectSystem();
   }
 
   void Comm::moduleIDInfo(){
@@ -117,11 +105,8 @@ namespace Regatron {
     }
     if(this->m_portNrFound != -1){
       LOG_INFO(fmt::format("module connect at {} is configured as {}, module ID {}.",
-          this->m_portNrFound, ((this->m_moduleID==0)?"master":"slave"), this->m_moduleID));
+          this->m_portNrFound, ((m_readings->isMaster())?"master":"slave"),
+          m_readings->getModuleID()));
     }
-  }
-
-  bool Comm::isMaster(){
-    return this->m_moduleID == 0;
   }
 }

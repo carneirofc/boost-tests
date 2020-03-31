@@ -1,8 +1,6 @@
 
 #pragma once
 
-#define SYS_VALUES 64
-#define DEV_VALUES 0
 
 #include <memory>
 #include <unistd.h>
@@ -12,6 +10,13 @@
 #include "IBC.hpp"
 
 namespace Regatron {
+
+  enum DllStatus {
+    OK = 0,
+    DLL_FAILURE = -1,
+    COMM_ERROR = -10,
+    COMMAND_ERROR = -100
+  };
 
   class Comm {
     private:
@@ -38,9 +43,7 @@ namespace Regatron {
       double incSysPower = 0.0;
       double incSysResistance = 0.0;
 
-      void selectModule(int);
-      void selectDevice();
-      void selectSystem();
+      DllStatus getDllStatus();
 
     public:
       Comm(int port);

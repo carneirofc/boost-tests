@@ -6,7 +6,7 @@
 
 #include "log/Logger.hpp"
 #include "net/Server.hpp"
-#include "regatron/Handler.cpp"
+#include "regatron/Handler.hpp"
 #include "regatron/Comm.hpp"
 
 void help(){
@@ -26,8 +26,8 @@ int main(const int argc, const char* argv[]){
 
     if(argc == 3){
         try{
-            tcpPort = std::stof(argv[1]);
-            regDevPort = std::stof(argv[2]);
+            tcpPort = std::stoi(argv[1]);
+            regDevPort = std::stoi(argv[2]);
 
         }catch(const std::invalid_argument& e){
             LOG_CRITICAL("Invalid argument {}.", e.what());
@@ -42,14 +42,6 @@ int main(const int argc, const char* argv[]){
         exit(-1);
     }
 
-
-    // try {
-    //     auto reg = std::make_unique<Regatron::Comm>();
-    //     reg->moduleIDInfo();
-    //     reg->connect(1);
-    // }catch (std::runtime_error &e){
-    //     LOG_CRITICAL("Exception: {}", e.what());
-    // }
     std::shared_ptr<Regatron::Comm> regatron = std::make_shared<Regatron::Comm>(regDevPort);
     std::shared_ptr<Regatron::Handler> handler = std::make_shared<Regatron::Handler>(regatron);
     std::shared_ptr<Net::Server> server = std::make_shared<Net::Server>(handler);
