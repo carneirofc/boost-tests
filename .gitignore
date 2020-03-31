@@ -2,3 +2,4 @@
 .vscode/settings.json
 .vscode/tasks.json
 regatron-interface/build/
+vendor/boost_1_71_0/
