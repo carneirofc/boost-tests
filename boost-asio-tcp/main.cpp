@@ -28,17 +28,10 @@ class CustomHandler: public Net::Handler{
         
         #define SET_FLOAT "set float_test "
 
-        const float getParam(const char* message, const char* pattern, float* res){
+        void getParam(const char* message, const char* pattern, float* res){
          if(std::sscanf(message, pattern, &res) != 1){
             throw std::invalid_argument(fmt::format("Malformed command! {}", message));
          }
-         /*if(message.starts_with(prefix)){
-            std::string_view strVal = message;
-            strVal.remove_prefix(prefix.size());
-            if(strVal.ends_with("\n")){ strVal.remove_suffix(1);}
-            return std::stof(strVal);
-         }
-         */
         }
 
         const std::string handle(const std::string& message) override{
